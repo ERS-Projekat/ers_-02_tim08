@@ -7,6 +7,7 @@ using Domain.BazaPodataka;
 using Domain.Modeli;
 using Domain.Modeli.Enumeracije;
 using Domain.Repozitorijumi;
+
 namespace Database.Repozitorijumi
 {
     public class PaleteRepozitorijum : IPaleteRepozitorijum

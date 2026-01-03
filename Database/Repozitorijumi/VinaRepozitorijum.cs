@@ -22,7 +22,7 @@ namespace Database.Repozitorijumi
             this.bazaPodataka = bazaPodataka;
         }
 
-        Vino DodajVino(Vino vino) 
+        public Vino DodajVino(Vino vino) 
         {
             try
             {
@@ -37,7 +37,7 @@ namespace Database.Repozitorijumi
             }
 
         }
-        Vino PronadjiVinoPoId(long id) 
+        public Vino PronadjiVinoPoId(long id) 
         {
             try
             {
@@ -48,7 +48,7 @@ namespace Database.Repozitorijumi
                 return new Vino();
             }
         }
-        IEnumerable<Vino> SvaVina() 
+        public IEnumerable<Vino> SvaVina() 
         {
             try
             {
@@ -59,7 +59,7 @@ namespace Database.Repozitorijumi
                 return new List<Vino>();
             }
         }
-        IEnumerable<Vino> PronadjiVinaPoKategoriji(KategorijaVina kategorija) 
+        public IEnumerable<Vino> PronadjiVinaPoKategoriji(KategorijaVina kategorija) 
         {
             try
             {
@@ -70,7 +70,7 @@ namespace Database.Repozitorijumi
                 return new List<Vino>();
             }
         }
-        bool AzuzirajVino(Vino vino) 
+        public bool AzuzirajVino(Vino vino) 
         {
             try
             {
