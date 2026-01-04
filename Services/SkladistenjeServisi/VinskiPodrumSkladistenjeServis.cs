@@ -49,7 +49,7 @@ namespace Services.SkladistenjeServisi
             }
             catch (Exception ex)
             {
-                loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Desio se exception tokom isporuke paleta");
+                loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Desio se exception tokom isporuke paleta");
                 return new List<Paleta>();
             }
         }

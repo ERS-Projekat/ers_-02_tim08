@@ -30,7 +30,7 @@ namespace Services.PakovanjeServisi
         {
             try
             {
-               
+
                 foreach (var id in idVina)
                 {
                     var vino = vinaRepozitorijum.PronadjiVinoPoId(id);
@@ -54,23 +54,23 @@ namespace Services.PakovanjeServisi
                     }
                 }
 
-                
-                Paleta paleta = new Paleta();
+
+                Paleta paleta = new Paleta(adresaOdredista, idVinskogPodruma);
                 paleta.IdVina = idVina;
-                paleta.AdresaOdredista = adresaOdredista;
-                paleta.IdVinskogPodruma = idVinskogPodruma;
 
                 paleta = paleteRepozitorijum.DodajPaletu(paleta);
 
-                
+
                 loggerServis.EvidentirajDogadjaj(TipEvidencije.INFO, $"Vina su upakovana u paletu {paleta.Id}.");
 
                 return paleta;
             }
-            catch
+            catch (Exception ex)
             {
-                loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Pakovanje vina u paletu neuspesno!");
-                return new Paleta();
+                {
+                    loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Pakovanje vina u paletu neuspesno! Exception error: {ex}");
+                    return new Paleta();
+                }
             }
         }
 
@@ -78,45 +78,36 @@ namespace Services.PakovanjeServisi
         {
             try
             {
-                
+
                 var paleta = paleteRepozitorijum.PronadjiPaletuPoId(idPalete);
                 if (paleta.Id == 0)
                 {
-                    loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Slanje palete {idPalete} neuspesno!");
+                    loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Slanje palete {idPalete} neuspesno!");
                     return false;
                 }
 
-                
+
                 if (paleta.Status == StatusPalete.Upakovana)
                 {
-                    VinskiPodrum vinskiPodrum = vinskiPodrumiRepozitorijum.PronadjiVinskiPodrumPoId(paleta.IdVinskogPodruma);
-                    if (vinskiPodrum.Id == 0 || vinskiPodrum.MaxBrojPaleta <= vinskiPodrum.IdPaleta.Count)
-                    {
-                        loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Slanje palete {idPalete} neuspesno!");
-                        return false;
-                    }
-                    vinskiPodrum.IdPaleta.Add(paleta.Id);
-                    vinskiPodrumiRepozitorijum.AzurirajVinskiPodrum(vinskiPodrum);
-
-
                     paleta.Status = StatusPalete.Otpremljena;
                     paleteRepozitorijum.AzurirajPaletu(paleta);
 
-                    
                     loggerServis.EvidentirajDogadjaj(TipEvidencije.INFO, $"Paleta {idPalete} poslata u podrum {paleta.IdVinskogPodruma}.");
 
                     return true;
                 }
                 else
                 {
-                    loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Slanje palete {idPalete} neuspesno!");
+                    loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Slanje palete {idPalete} neuspesno!");
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Slanje palete {idPalete} neuspesno!");
-                return false;
+                {
+                    loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Slanje palete {idPalete} neuspesno! Exception error: {ex}");
+                    return false;
+                }
             }
         }
     }
