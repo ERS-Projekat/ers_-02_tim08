@@ -7,7 +7,9 @@ using Domain.BazaPodataka;
 using Domain.Interfaci;
 using Domain.Modeli;
 using Domain.Modeli.Enumeracije;
+using Domain.Repozitorijumi;
 using Services;
+using Services.LoggerServisi;
 
 namespace Services.PakovanjeServisi
 {
@@ -28,17 +30,31 @@ namespace Services.PakovanjeServisi
         {
             try
             {
-                //Proverava da li vina postoje
+               
                 foreach (var id in idVina)
                 {
                     var vino = vinaRepozitorijum.PronadjiVinoPoId(id);
                     if (vino.Id == 0)
                     {
+                        loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Nismo nasli vino sa id: {id}!");
                         return new Paleta();
                     }
                 }
 
-                //Kreira novu paletu
+                var svePalete = paleteRepozitorijum.SvePalete();
+
+                foreach (var idVina_ in idVina)
+                {
+                    bool postojiNaPaleti = svePalete.Any(p => p.IdVina.Contains(idVina_));
+
+                    if (postojiNaPaleti)
+                    {
+                        loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Vino {idVina_} je već na paleti - ne može se dodati ponovo");
+                        return new Paleta();
+                    }
+                }
+
+                
                 Paleta paleta = new Paleta();
                 paleta.IdVina = idVina;
                 paleta.AdresaOdredista = adresaOdredista;
@@ -46,14 +62,14 @@ namespace Services.PakovanjeServisi
 
                 paleta = paleteRepozitorijum.DodajPaletu(paleta);
 
-                //Logovanje
-                loggerServis.EvidentirajDogadjaj(TipEvidencije.INFO, $"Pakovanje vina u paletu {paleta.Id}.");
+                
+                loggerServis.EvidentirajDogadjaj(TipEvidencije.INFO, $"Vina su upakovana u paletu {paleta.Id}.");
 
                 return paleta;
             }
             catch
             {
-                loggerServis.EvidentirajDogadjaj(TipEvidencije.ERROR, $"Pakovanje vina u paletu neuspesno!");
+                loggerServis.EvidentirajDogadjaj(TipEvidencije.WARNING, $"Pakovanje vina u paletu neuspesno!");
                 return new Paleta();
             }
         }
@@ -62,7 +78,7 @@ namespace Services.PakovanjeServisi
         {
             try
             {
-                //Pronalazi paletu
+                
                 var paleta = paleteRepozitorijum.PronadjiPaletuPoId(idPalete);
                 if (paleta.Id == 0)
                 {
@@ -70,7 +86,7 @@ namespace Services.PakovanjeServisi
                     return false;
                 }
 
-                //salje paletu u vinski podrum
+                
                 if (paleta.Status == StatusPalete.Upakovana)
                 {
                     VinskiPodrum vinskiPodrum = vinskiPodrumiRepozitorijum.PronadjiVinskiPodrumPoId(paleta.IdVinskogPodruma);
@@ -81,6 +97,7 @@ namespace Services.PakovanjeServisi
                     }
                     vinskiPodrum.IdPaleta.Add(paleta.Id);
                     vinskiPodrumiRepozitorijum.AzurirajVinskiPodrum(vinskiPodrum);
+
 
                     paleta.Status = StatusPalete.Otpremljena;
                     paleteRepozitorijum.AzurirajPaletu(paleta);
